@@ -103,8 +103,8 @@ public class HashCount1 {
 	public static void main(String[] args) throws Exception {
 
 		Configuration conf = new Configuration();
-		//conf.addResource(new Path("/home/y/CS5344/hadoop-1.2.1/conf/core-site.xml"));
-		//conf.addResource(new Path("/home/y/CS5344/hadoop-1.2.1/conf/hdfs-site.xml"));
+		conf.addResource(new Path("/home/hadoop/hadoop/hadoop-1.2.1/conf/core-site.xml"));
+		conf.addResource(new Path("/home/hadoop/hadoop/hadoop-1.2.1/conf/hdfs-site.xml"));
 
 		// ===== Stage 1 =====
 		Job job1 = new Job(conf, "Stage 1: Frequency Count");
@@ -129,7 +129,7 @@ public class HashCount1 {
 		job2.setOutputKeyClass(IntWritable.class);
 		job2.setOutputValueClass(Text.class);
 		job2.setNumReduceTasks(1);
-		FileInputFormat.addInputPath(job2, new Path("/twitterH2Outs/output1"));
+		FileInputFormat.addInputPath(job2, new Path("/twitterOuts/output1"));
 		FileOutputFormat.setOutputPath(job2, new Path("/twitterOuts/output2"));
 		job2.waitForCompletion(true);
 
