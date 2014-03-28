@@ -1,5 +1,8 @@
 package sg.edu.nus.cs5344.spring14.naiveHashCount;
 
+//input files are hard-coded at "/TwitterInFiles/twitter_10k.tar.gz"
+//output file will go to "/twitterOuts/output1"
+
 import java.io.IOException;
 import java.util.StringTokenizer;
 
@@ -103,8 +106,8 @@ public class HashCount1 {
 	public static void main(String[] args) throws Exception {
 
 		Configuration conf = new Configuration();
-		conf.addResource(new Path("/home/hadoop/hadoop/hadoop-1.2.1/conf/core-site.xml"));
-		conf.addResource(new Path("/home/hadoop/hadoop/hadoop-1.2.1/conf/hdfs-site.xml"));
+		//conf.addResource(new Path("/home/hadoop/hadoop/hadoop-1.2.1/conf/core-site.xml"));
+		//conf.addResource(new Path("/home/hadoop/hadoop/hadoop-1.2.1/conf/hdfs-site.xml"));
 
 		// ===== Stage 1 =====
 		Job job1 = new Job(conf, "Stage 1: Frequency Count");
