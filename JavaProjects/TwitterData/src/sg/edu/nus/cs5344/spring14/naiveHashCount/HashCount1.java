@@ -2,6 +2,7 @@ package sg.edu.nus.cs5344.spring14.naiveHashCount;
 
 //input files are hard-coded at "/TwitterInFiles/twitter_10k.tar.gz"
 //output file will go to "/twitterOuts/output1"
+//View by Chin Leong
 
 import java.io.IOException;
 import java.util.StringTokenizer;
