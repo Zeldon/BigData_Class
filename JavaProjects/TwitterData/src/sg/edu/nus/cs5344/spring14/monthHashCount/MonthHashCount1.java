@@ -2,6 +2,7 @@ package sg.edu.nus.cs5344.spring14.monthHashCount;
 
 //Input file is hardcoded at "/TwitterInFiles/time_twitter.tar.gz" found in main
 //Outputs are hardcoded at "/twitterMHOuts/" found in main
+//Abnormal rows will be highlighted with "No._of_Abnormal_Rows:"
 //This takes the inputfile, and parses the year-month at the 14th column, the hashtags at the 3rd column
 // and outputs the (year-month_#hashtag, 1) value pair at the 1st Mapper
 // The first reducer sums the frequency count and outputs (year-month_#hashtag, frequency)
@@ -31,12 +32,12 @@ public class MonthHashCount1 {
 
 		private final static IntWritable freq = new IntWritable(1);
 		private Text month_hash = new Text();
-		int row = 0;
+		//int row = 0;
 
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 			
-			row++;
+			//row++;
 			String line[]=value.toString().split("\\t");
 			
 			if (line.length==14){
@@ -60,7 +61,7 @@ public class MonthHashCount1 {
 
 				
 			}else{
-				month_hash.set("--Row"+Integer.toString(row)+"--");
+				month_hash.set("No._of_Abnormal_Rows:");
 				context.write(month_hash, freq);
 			}
 			
