@@ -1,4 +1,4 @@
-package sg.edu.nus.cs5344.spring14.naiveHashCount;
+package sg.edu.nus.cs5344.spring14.twitter.hashCounts;
 
 //input files are hard-coded at "/TwitterInFiles/twitter_10k.tar.gz"
 //output file will go to "/twitterOuts/output1"

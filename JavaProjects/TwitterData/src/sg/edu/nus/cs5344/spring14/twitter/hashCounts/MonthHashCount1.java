@@ -1,4 +1,4 @@
-package sg.edu.nus.cs5344.spring14.monthHashCount;
+package sg.edu.nus.cs5344.spring14.twitter.hashCounts;
 
 //Input file is hardcoded at "/TwitterInFiles/time_twitter.tar.gz" found in main
 //Outputs are hardcoded at "/twitterMHOuts/" found in main
