@@ -31,7 +31,7 @@ public class JobAParseText {
 			}
 			if (line.charAt(line.length() -1) == '\\') {
 				// This line continues on the next
-				lineBuffer = line;
+				lineBuffer = line.substring(0, line.length()-1);
 				return;
 			}
 
