@@ -128,4 +128,9 @@ implements Iterable<E>, WritableComparable<ListWritable<E>> {
 		// Everything is equal.
 		return 0;
 	}
+
+	@Override
+	public String toString() {
+		return list.toString();
+	}
 }
