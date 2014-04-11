@@ -159,4 +159,16 @@ public class Tweet implements WritableComparable<Tweet>, Copyable<Tweet> {
 	public Tweet copy() {
 		return new Tweet(time, latLong, hashTagList);
 	}
+
+	public HashTagList getHashTagList() {
+		return hashTagList;
+	}
+
+	public LatLong getLatLong() {
+		return latLong;
+	}
+
+	public Time getTime() {
+		return time;
+	}
 }
