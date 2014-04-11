@@ -52,4 +52,9 @@ public class Time implements WritableComparable<Time>, Copyable<Time> {
 	public Day getDay() {
 		return new Day(this);
 	}
+
+	@Override
+	public String toString() {
+		return date.toString();
+	}
 }
