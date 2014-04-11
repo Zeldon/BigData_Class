@@ -3,6 +3,9 @@ package sg.edu.nus.cs5344.spring14.twitter.datastructure;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import org.apache.hadoop.io.WritableComparable;
 
@@ -16,6 +19,8 @@ import sg.edu.nus.cs5344.spring14.twitter.datastructure.collections.HashTagList;
  *
  */
 public class Tweet implements WritableComparable<Tweet>, Copyable<Tweet> {
+
+	private static SimpleDateFormat dateFormat = getDateFormat();
 
 	private Time time = new Time();
 	private LatLong latLong = new LatLong();
@@ -35,16 +40,70 @@ public class Tweet implements WritableComparable<Tweet>, Copyable<Tweet> {
 	 * @param line
 	 * @throws IllegalArgumentException if the line cannot be parsed.
 	 */
-	public Tweet(String line) {
+	public Tweet(String lineString) {
 		// TODO: Implement this
-		// 1. split line into columns
 		// 2. Convert textual time to a Time object
 		// 3. Convert Lat and long coordinates to doubles, and create a LatLong object
 		// 4. Read all hashtags into a hasTagList
 
+		String line[]=lineString.split("\\t");
+		if (line.length!=14) {
+			throw new IllegalArgumentException("Wrong number of columns: " + line.length);
+		}
+		// Line contents
+		// 0:  ID
+		// 1:  Time of creation YYYY-MM-DD kk:mm:ss
+		// 2:  Tweet Text
+		// 3:  Hashtabs (comma sep) or "\\N"
+		// 4:  Keywords
+		// 5:  lat
+		// 6:  long
+		// 7:  ulocation
+		// 8:  Place full name
+		// 9:  Country
+		// 10: User name
+		// 11: User Language
+		// 12: ulocation
+		// 13: Time of ??? YYYY-MM-DD kk:mm:ss
+
+
+		// Convert hashtags:
+		hashTagList = readHashtags(line);
+
+		// Convert Time:
+		try {
+			time = new Time(dateFormat.parse(line[1]).getTime());
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Can't parse time", e);
+		}
+
+		// Convert location:
+		double lat = Double.parseDouble(line[5]);
+		double lon = Double.parseDouble(line[6]);
+		latLong = new LatLong(lat, lon);
+
 	}
 
 
+	private HashTagList readHashtags(String[] line) {
+		String tagsString = line[3];
+		HashTagList list = new HashTagList();
+
+		if (!"\\N".equals(tagsString)) {
+			for (String tag : tagsString.split(",")) {
+				list.add(new Hashtag(tag));
+			}
+		}
+		return list;
+	}
+
+
+
+	private static SimpleDateFormat getDateFormat() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("GMT"));;
+		return format;
+	}
 
 	@Override
 	public void write(DataOutput out) throws IOException {
