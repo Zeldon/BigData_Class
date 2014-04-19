@@ -7,12 +7,12 @@ import org.apache.hadoop.io.VIntWritable;
  * @author Tobias Bertelsen
  *
  */
-public class Day extends VIntWritable {
+public class Day extends VIntWritable implements Copyable<Day> {
 
 
 	/**
 	 * Day zero of the day index. <b>DO NOT MODIFY</b>
-	 * 
+	 *
 	 * <p>
 	 * It is specified to be 1359562320000L which is 2014-12-31.
 	 * Run this code, to calculate new values:
@@ -24,7 +24,16 @@ public class Day extends VIntWritable {
 
 	public Day(){
 	}
+
+	public Day(int value) {
+		super(value);
+	}
 	public Day(Time time) {
 		super(time.getDaysBetween(DAY_ZERO));
+	}
+
+	@Override
+	public Day copy() {
+		return new Day(get());
 	}
 }
