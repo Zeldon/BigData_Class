@@ -14,11 +14,17 @@ import sg.edu.nus.cs5344.spring14.twitter.datastructure.collections.HashTagList;
 /**
  * A single tweet.
  * This class contains all the information we need about a single tweet.
- * 
+ *
  * @author Tobias Bertelsen
  *
  */
 public class Tweet implements WritableComparable<Tweet>, Copyable<Tweet> {
+
+	public static final int EXPECTED_COLUMNS = 14;
+
+	public static String[] split(String lineString) {
+		return lineString.split("\\t");
+	}
 
 	private static SimpleDateFormat dateFormat = getDateFormat();
 
@@ -41,13 +47,12 @@ public class Tweet implements WritableComparable<Tweet>, Copyable<Tweet> {
 	 * @throws IllegalArgumentException if the line cannot be parsed.
 	 */
 	public Tweet(String lineString) {
-		// TODO: Implement this
-		// 2. Convert textual time to a Time object
-		// 3. Convert Lat and long coordinates to doubles, and create a LatLong object
-		// 4. Read all hashtags into a hasTagList
+		this(split(lineString));
+	}
 
-		String line[]=lineString.split("\\t");
-		if (line.length!=14) {
+	public Tweet(String[] line) {
+
+		if (line.length!=EXPECTED_COLUMNS) {
 			throw new IllegalArgumentException("Wrong number of columns: " + line.length);
 		}
 		// Line contents
