@@ -57,4 +57,8 @@ public class Time implements WritableComparable<Time>, Copyable<Time> {
 	public String toString() {
 		return date.toString();
 	}
+
+	public Date getDateCopy() {
+		return new Date(date.getTime());
+	}
 }
