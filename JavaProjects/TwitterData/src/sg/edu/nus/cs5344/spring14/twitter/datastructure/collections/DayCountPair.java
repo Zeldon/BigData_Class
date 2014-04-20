@@ -26,6 +26,6 @@ public class DayCountPair extends Pair<Day, VIntWritable> implements Copyable<Da
 
 	@Override
 	public DayCountPair copy() {
-		return new DayCountPair(getDay(), getCount());
+		return new DayCountPair(new Day(getDay().get()), new VIntWritable(getCount().get()));
 	}
 }
