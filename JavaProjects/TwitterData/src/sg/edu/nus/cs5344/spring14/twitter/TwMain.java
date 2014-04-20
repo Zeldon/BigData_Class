@@ -2,6 +2,7 @@ package sg.edu.nus.cs5344.spring14.twitter;
 
 import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getOutputForJob;
 import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getSpecaialFolder;
+import static sg.edu.nus.cs5344.spring14.twitter.KeyValueFormatters.getTabDelimimted;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.DAY_STATS_DATA_FOLDER_ATT;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TRENDS_DATA_FOLDER_ATT;
 
@@ -38,6 +39,7 @@ import sg.edu.nus.cs5344.spring14.twitter.datastructure.Trend;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Tweet;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.collections.DayCountPair;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.collections.DayHashtagPair;
+import sg.edu.nus.cs5344.spring14.twitter.datastructure.collections.TweetList;
 
 public class TwMain {
 
@@ -83,18 +85,8 @@ public class TwMain {
 			}
 		}
 
-
-		// Write human readable files
-		FileSystem fs = FileSystem.get(conf);
-		OutputStream fileStream = null;
-		try {
-			fileStream = fs.create(FileLocations.getTextOutputPath("trends.txt"));
-			printOutput(conf, getOutputForJob("C"), new Hashtag(), new Trend(), new PrintStream(fileStream), System.out);
-		} finally {
-			if (fileStream != null) {
-				fileStream.close();
-			}
-		}
+		printTrends(conf);
+		printTweetsForTrends(conf);
 	}
 
 	private static Job createJobA(final Configuration conf, final Path input, final Path output) throws IOException {
@@ -206,6 +198,61 @@ public class TwMain {
 		return job;
 	}
 
+	private static Job createJobF(final Configuration conf, final Path input, final Path output) throws IOException {
+		prepOutDir(conf, output);
+
+		Job job = new Job(conf, "Finding Tweets for Trends");
+		job.setJarByClass(JobFTweetsForTrends.class);
+		// Map
+		FileInputFormat.addInputPath(job, input);
+		// job.setInputFormatClass(SequenceFileInputFormat.class);
+		job.setMapperClass(JobFTweetsForTrends.MapperImpl.class);
+		job.setMapOutputKeyClass(Hashtag.class);
+		job.setMapOutputValueClass(Tweet.class);
+		// Reduce
+		job.setReducerClass(JobFTweetsForTrends.ReducerImpl.class);
+		job.setOutputKeyClass(Hashtag.class);
+		job.setOutputValueClass(TweetList.class);
+		// Store intermediate data in as sequence file (binary) format
+		job.setInputFormatClass(SequenceFileInputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+		FileOutputFormat.setOutputPath(job, output);
+		return job;
+	}
+
+	/**
+	 * Prints the tweets for each trend.
+	 */
+	private static void printTweetsForTrends(Configuration conf) throws IOException {
+		// Write human readable files
+		FileSystem fs = FileSystem.get(conf);
+		OutputStream fileStream = null;
+		KeyValueFormatter<Hashtag, TweetList> formatter = new TweetFormater();
+		try {
+			fileStream = fs.create(FileLocations.getTextOutputPath("tweetsForTrends.txt"));
+			printOutput(conf, getOutputForJob("F"), new Hashtag(), new TweetList(), formatter, new PrintStream(fileStream));
+		} finally {
+			if (fileStream != null) {
+				fileStream.close();
+			}
+		}
+	}
+
+	private static void printTrends(Configuration conf) throws IOException {
+		// Write human readable files
+		FileSystem fs = FileSystem.get(conf);
+		OutputStream fileStream = null;
+		KeyValueFormatter<Hashtag, Trend> formatter = getTabDelimimted();
+		try {
+			fileStream = fs.create(FileLocations.getTextOutputPath("trends.txt"));
+			printOutput(conf, getOutputForJob("C"), new Hashtag(), new Trend(), formatter, new PrintStream(fileStream), System.out);
+		} finally {
+			if (fileStream != null) {
+				fileStream.close();
+			}
+		}
+	}
+
 	/**
 	 * Prints small files, for which it would be a waste to run an entire job.
 	 *
@@ -217,19 +264,19 @@ public class TwMain {
 	 * @throws IOException
 	 */
 	private static <K extends Writable, V extends Writable> void printOutput(Configuration conf, Path folder, K key,
-			V value, PrintStream... outs) throws IOException {
+			V value, KeyValueFormatter<K, V> formatter, PrintStream... outs) throws IOException {
 		FileSystem fs = FileSystem.get(conf);
 
 		for (Path path : FileUtils.getAllParts(folder, fs)) {
 			for (PrintStream out : outs) {
-				out.println(path);
+				out.println("// FROM FILE: " + path);
 			}
 			Reader reader = null;
 			try {
 				reader = new SequenceFile.Reader(fs, path, conf);
 				while (reader.next(key, value)) {
 					for (PrintStream out : outs) {
-						out.println(key + "\t" + value);
+						out.println(formatter.format(key, value));
 					}
 				}
 			} finally {
