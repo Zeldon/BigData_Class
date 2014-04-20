@@ -2,6 +2,8 @@ package sg.edu.nus.cs5344.spring14.twitter;
 
 import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getOutputForJob;
 import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getSpecaialFolder;
+import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.DAY_STATS_DATA_FOLDER_ATT;
+import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TRENDS_DATA_FOLDER_ATT;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +31,7 @@ import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobBCountHashtags;
 import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobCFindTrends;
 import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobDDayStats;
 import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobEFilterTweets;
+import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobFTweetsForTrends;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Day;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Hashtag;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Trend;
@@ -45,8 +48,8 @@ public class TwMain {
 		CmdArguments cmdArgs = CmdArguments.instantiate(otherArgs);
 
 		prepOutDir(conf, getSpecaialFolder());
-		conf.set(TwConsts.DAY_STATS_DATA_FOLDER_ATT, getOutputForJob("D").toString());
-
+		conf.set(DAY_STATS_DATA_FOLDER_ATT, getOutputForJob("D").toString());
+		conf.set(TRENDS_DATA_FOLDER_ATT, getOutputForJob("C").toString());
 
 		List<Job> jobs = new ArrayList<Job>();
 
@@ -69,12 +72,13 @@ public class TwMain {
 		if (!cmdArgs.skipJob("C")) {
 			jobs.add(createJobC(conf, getOutputForJob("B"), getOutputForJob("C")));
 		}
-
+		if (!cmdArgs.skipJob("F")) {
+			jobs.add(createJobF(conf, getOutputForJob("E"), getOutputForJob("F")));
+		}
 
 		for (Job job : jobs) {
-
 			System.out.println("\nRunning Job:" + job.getJobName());
-			if(!job.waitForCompletion(true)) {
+			if (!job.waitForCompletion(true)) {
 				throw new RuntimeException("Job failed: " + job.getJobName());
 			}
 		}

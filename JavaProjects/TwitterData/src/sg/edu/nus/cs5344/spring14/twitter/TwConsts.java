@@ -59,6 +59,19 @@ public class TwConsts {
 	 */
 	public static final int NUM_BEST_TRENDS = 50;
 
+
+	/**
+	 * The number of days before a trend we want to extract tweets.
+	 * When we extract tweets for a given hashtags, this number determine
+	 * how many days before the trend, we will get tweets.
+	 */
+	public static final int DAYS_BEFORE_TREND = 1;
+
+	/**
+	 * The number of days after a trend we want to extract tweets.
+	 */
+	public static final int DAYS_AFTER_TREND = 1;
+
 	/**
 	 * All day indexes strictly lower than this value, should not be included.
 	 * Value is 158 = 2012-09-06, which is the first day after the great spikes
@@ -69,4 +82,6 @@ public class TwConsts {
 	public static final int FILTER_MIN_HASHTAGS_PER_DAY = 110000;
 
 	public static final String DAY_STATS_DATA_FOLDER_ATT = "DAY_STATS_FOLDER";
+
+	public static final String TRENDS_DATA_FOLDER_ATT = "TRENDS_FOLDER";
 }
