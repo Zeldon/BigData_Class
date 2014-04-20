@@ -36,9 +36,9 @@ public class Tweet implements WritableComparable<Tweet>, Copyable<Tweet> {
 	}
 
 	public Tweet(Time time, LatLong latLong, HashTagList hashTagList){
-		time = time.copy();
-		latLong = latLong.copy();
-		hashTagList = hashTagList.copy();
+		this.time = time.copy();
+		this.latLong = latLong.copy();
+		this.hashTagList = hashTagList.copy();
 	}
 
 	/**
