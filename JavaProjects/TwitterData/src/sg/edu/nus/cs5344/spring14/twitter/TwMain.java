@@ -1,11 +1,7 @@
 package sg.edu.nus.cs5344.spring14.twitter;
 
-import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getInput;
 import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getOutputForJob;
 import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getSpecaialFolder;
-import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getSpecialFile;
-import static sg.edu.nus.cs5344.spring14.twitter.FileLocations.getTextOutputPath;
-import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.FIRST_DAY_FILE_ATT;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -27,13 +22,13 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobAParseText;
 import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobBCountHashtags;
 import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobCFindTrends;
 import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobDDayStats;
+import sg.edu.nus.cs5344.spring14.twitter.Jobs.JobEFilterTweets;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Day;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Hashtag;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Trend;
@@ -50,22 +45,29 @@ public class TwMain {
 		CmdArguments cmdArgs = CmdArguments.instantiate(otherArgs);
 
 		prepOutDir(conf, getSpecaialFolder());
-		conf.set(FIRST_DAY_FILE_ATT, getSpecialFile("firstDay").toString());
+		conf.set(TwConsts.DAY_STATS_DATA_FOLDER_ATT, getOutputForJob("D").toString());
 
 
 		List<Job> jobs = new ArrayList<Job>();
 
+		// The order is not alphabetical!
+
 		if (!cmdArgs.skipJob("A")) {
-			jobs.add(createJobA(conf, getInput(), getOutputForJob("A")));
+			throw new RuntimeException("Job A is Hardcoded not to run. Please use -skip A or change source code");
+			// jobs.add(createJobA(conf, getInput(), getOutputForJob("A")));
 		}
+		if (!cmdArgs.skipJob("D")) {
+			jobs.add(createJobD(conf, getOutputForJob("A"), getOutputForJob("D")));
+		}
+		if (!cmdArgs.skipJob("E")) {
+			jobs.add(createJobE(conf, getOutputForJob("A"), getOutputForJob("E")));
+		}
+
 		if (!cmdArgs.skipJob("B")) {
-			jobs.add(createJobB(conf, getOutputForJob("A"), getOutputForJob("B")));
+			jobs.add(createJobB(conf, getOutputForJob("E"), getOutputForJob("B")));
 		}
 		if (!cmdArgs.skipJob("C")) {
 			jobs.add(createJobC(conf, getOutputForJob("B"), getOutputForJob("C")));
-		}
-		if (!cmdArgs.skipJob("D")) {
-			jobs.add(createJobD(conf, getOutputForJob("A"), getTextOutputPath("DayStats")));
 		}
 
 
@@ -173,7 +175,29 @@ public class TwMain {
 		job.setOutputValueClass(VIntWritable.class);
 		// Store intermediate data in as sequence file (binary) format
 		job.setInputFormatClass(SequenceFileInputFormat.class);
-		job.setOutputFormatClass(TextOutputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+		FileOutputFormat.setOutputPath(job, output);
+		return job;
+	}
+
+	private static Job createJobE(final Configuration conf, final Path input, final Path output) throws IOException {
+		prepOutDir(conf, output);
+
+		Job job = new Job(conf, "Filtering Tweets");
+		job.setJarByClass(JobEFilterTweets.class);
+		// Map
+		FileInputFormat.addInputPath(job, input);
+		// job.setInputFormatClass(SequenceFileInputFormat.class);
+		job.setMapperClass(JobEFilterTweets.MapperImpl.class);
+		job.setMapOutputKeyClass(Tweet.class);
+		job.setMapOutputValueClass(NullWritable.class);
+		// Reduce
+		job.setReducerClass(JobEFilterTweets.ReducerImpl.class);
+		job.setOutputKeyClass(Tweet.class);
+		job.setOutputValueClass(NullWritable.class);
+		// Store intermediate data in as sequence file (binary) format
+		job.setInputFormatClass(SequenceFileInputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 		FileOutputFormat.setOutputPath(job, output);
 		return job;
 	}
@@ -191,20 +215,14 @@ public class TwMain {
 	private static <K extends Writable, V extends Writable> void printOutput(Configuration conf, Path folder, K key,
 			V value, PrintStream... outs) throws IOException {
 		FileSystem fs = FileSystem.get(conf);
-		FileStatus[] listFies = fs.globStatus(new Path(folder, "part-*"));
-		if (listFies.length == 0) {
-			for (PrintStream out : outs) {
-				out.println("NO OUTPUT FILE FOUND IN " + folder);
-			}
-		}
 
-		for (FileStatus fileStatus : listFies) {
+		for (Path path : FileUtils.getAllParts(folder, fs)) {
 			for (PrintStream out : outs) {
-				out.println(fileStatus.getPath());
+				out.println(path);
 			}
 			Reader reader = null;
 			try {
-				reader = new SequenceFile.Reader(fs, fileStatus.getPath(), conf);
+				reader = new SequenceFile.Reader(fs, path, conf);
 				while (reader.next(key, value)) {
 					for (PrintStream out : outs) {
 						out.println(key + "\t" + value);
