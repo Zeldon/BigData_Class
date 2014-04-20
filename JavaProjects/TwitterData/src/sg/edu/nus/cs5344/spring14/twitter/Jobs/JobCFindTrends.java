@@ -1,24 +1,31 @@
 package sg.edu.nus.cs5344.spring14.twitter.Jobs;
 
-import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.CHI_THRESHOLD;
-import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.MIN_DAYLY_TWEETS;
+import static java.lang.Math.max;
+import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.FILTER_FIRST_DAY;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.NUM_BEST_TRENDS;
+import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_CHI_THRESHOLD;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_LOOKBACK;
+import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_MIN_DAYLY_TWEETS;
+import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_MISSING_DAY_TOLLERANCE;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_WEEKDAY_BOOST;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
-import java.util.Scanner;
+import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.VIntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import sg.edu.nus.cs5344.spring14.twitter.ConfUtils;
+import sg.edu.nus.cs5344.spring14.twitter.TwConsts;
+import sg.edu.nus.cs5344.spring14.twitter.datastructure.Day;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Hashtag;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Trend;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Trend.TrendsBuilder;
@@ -38,18 +45,42 @@ public class JobCFindTrends {
 
 	public static class ReducerImpl extends Reducer<Hashtag, DayCountPair, Hashtag, Trend> {
 
-		TopKList<Trend> topKTrends = new TopKList<Trend>(NUM_BEST_TRENDS);
+		private Set<Integer> validDays = new HashSet<Integer>();
 
-		private int firstDay;
+		private TopKList<Trend> topKTrends = new TopKList<Trend>(NUM_BEST_TRENDS);
 
+		@SuppressWarnings("unchecked")
+		// VInt is not properly genericfied
 		@Override
-		protected void setup(Context context) throws IOException,
-				InterruptedException {
+		protected void setup(Context context) throws IOException, InterruptedException {
 			Configuration conf = context.getConfiguration();
-			FileSystem fs = FileSystem.get(conf);
-			Scanner sc = new Scanner(fs.open(ConfUtils.getFirstDayPath(conf)));
-			firstDay = sc.nextInt();
-			sc.close();
+			Set<Day> includedDaysSet = JobEFilterTweets.loadIncludedDays(conf);
+			List<Day> includedDaysList = new ArrayList<Day>(includedDaysSet);
+			Collections.sort(includedDaysList);
+
+			int lookbackStartIndex = 0;
+			for (int i = 0; i < includedDaysList.size(); i++) {
+				Day day = includedDaysList.get(i);
+				// Skip first days to avoid classify popular as trending.
+				if (day.get() <= FILTER_FIRST_DAY + TREND_LOOKBACK) {
+					System.out.println("Skipping first days: " + day);
+					continue;
+				}
+
+				// Find the first day within the lookback of this day
+				while (includedDaysList.get(lookbackStartIndex).get() < day.get() - TREND_LOOKBACK) {
+					lookbackStartIndex++;
+				}
+
+				int samples = i - lookbackStartIndex;
+				if (samples >= TREND_LOOKBACK - TREND_MISSING_DAY_TOLLERANCE) {
+					validDays.add(day.get());
+				} else {
+					System.out.println("Skipping day due to missing data: " + day);
+				}
+			}
+
+			System.out.println("Num Valid Days:" + validDays.size());
 		}
 
 		@Override
@@ -62,18 +93,15 @@ public class JobCFindTrends {
 			TrendsBuilder builder = null;
 
 			for (DayCountPair pair : counts) {
-				int thisDay = pair.getDay().get();
-
-				// Skip first days to avoid classify popular as trending.
-				// We add 1 for the current day, and 1 because the first day is likely half
-				if (thisDay <= firstDay + TREND_LOOKBACK + 2) {
+				if (!validDays.contains(pair.getDay().get())) {
 					prevDays.add(pair.copy());
 					continue;
 				}
 
+				int thisDay = pair.getDay().get();
+
 				// Remove days that are too old
-				while (prevDays.size() > 0 &&
-						prevDays.peek().getDay().get() < thisDay - TREND_LOOKBACK) {
+				while (prevDays.size() > 0 && prevDays.peek().getDay().get() < thisDay - TREND_LOOKBACK) {
 					prevDays.poll();
 				}
 
@@ -82,15 +110,15 @@ public class JobCFindTrends {
 				// Lecture 6 slide 10-13
 				double expected = calcExpected(prevDays, thisDay);
 				double observed = pair.getCount().get();
+				double denominator = TwConsts.TREND_USE_ALT_CHI ? observed : expected;
 				double chiSq = ((observed - expected) * (observed - expected)) / expected;
 
 				// Detect trends, build Trend objects, and keep the best
-				if (chiSq > CHI_THRESHOLD) {
+				if (chiSq > TREND_CHI_THRESHOLD && observed > expected) {
 					if (builder == null) {
 						// First day of trend
 						builder = new TrendsBuilder(hashtag);
-					} else if (prevDays.isEmpty() ||
-							thisDay - prevDays.peekLast().getDay().get() != 1) {
+					} else if (prevDays.isEmpty() || thisDay - prevDays.peekLast().getDay().get() != 1) {
 						// Handle quiet days between trends
 						bestTrend = updateBestTrend(bestTrend, builder);
 						builder = new TrendsBuilder(hashtag);
@@ -101,6 +129,8 @@ public class JobCFindTrends {
 					bestTrend = updateBestTrend(bestTrend, builder);
 					builder = null;
 				}
+
+				prevDays.add(pair.copy());
 			}
 
 			if (bestTrend != null) {
@@ -122,18 +152,19 @@ public class JobCFindTrends {
 			for (DayCountPair prevPair : prevDays) {
 				boolean isSameWeekday = (prevPair.getDay().get() - thisDay) % 7 == 0;
 				double factor = isSameWeekday ? TREND_WEEKDAY_BOOST : 1.0;
-				sum += prevPair.getCount().get() * factor;
+				int value = max(TREND_MIN_DAYLY_TWEETS, prevPair.getCount().get());
+				sum += value * factor;
 				numDays += factor;
 			}
-			int missingDays = TREND_LOOKBACK - prevDays.size();
-			sum += MIN_DAYLY_TWEETS * missingDays;
-			numDays += missingDays;
-			return sum/numDays;
+			if (numDays > 0.1) {
+				return max(sum / numDays, TREND_MIN_DAYLY_TWEETS);
+			} else {
+				return TREND_MIN_DAYLY_TWEETS;
+			}
 		}
 
 		@Override
-		protected void cleanup(Context context)
-				throws IOException, InterruptedException {
+		protected void cleanup(Context context) throws IOException, InterruptedException {
 			for (Trend trend : topKTrends.sortedList()) {
 				context.write(trend.getHashTag(), trend);
 			}

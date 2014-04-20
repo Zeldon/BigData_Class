@@ -9,14 +9,50 @@ public class TwConsts {
 	public static final int TREND_LOOKBACK = 7;
 
 	/**
-	 * How many times more the day of the week should count,
-	 * compared to other days.
+	 * Defines the number of missing days we can tolerate not having data for.
+	 */
+	public static final int TREND_MISSING_DAY_TOLLERANCE = 2;
+
+	public static final int TREND_MIN_DAYLY_TWEETS = 40;
+
+	/**
+	 * How many times more the day of the week should count, compared to other
+	 * days.
 	 *
 	 * Zero means no change
 	 *
-	 * A value of 3 mean that the day 7 days ago, will count as 4 days (3 days more)
+	 * A value of 3 mean that the day 7 days ago, will count as 4 days (3 days
+	 * more)
 	 */
 	public static final double TREND_WEEKDAY_BOOST = 3.0;
+
+	/**
+	 * The minimal chiSq scored for something to be considered a trend.
+	 * Not an important parameter, as we only keep to best trends, which are
+	 * way above this threshold
+	 *
+	 * For normal chi the flowing holds:
+	 * <ul>
+	 * <li> 95% significance = 3.84
+	 * <li> 99% significance = 6.64
+	 * </ul>
+	 *
+	 * Based on http://www2.lv.psu.edu/jxm57/irp/chisquar.htm
+	 */
+	public static final double TREND_CHI_THRESHOLD = 6.64;
+
+	/**
+	 * Whether the us the alternative chiSq metric.
+	 * The alternative chiSquared proritize popular tags higher
+	 * than one day peaks, by dividing with the observed value instead
+	 * of the expected, which is very low for one day peaks.
+	 * <pre>
+	 * chiSq = (E-O)^2/E
+	 * altChiSq = (E-O)^2/O
+	 * where E is expected and O is observed
+	 * </pre>
+	 */
+	public static final boolean TREND_USE_ALT_CHI = true;
 
 	/**
 	 * The number of trends to keep
