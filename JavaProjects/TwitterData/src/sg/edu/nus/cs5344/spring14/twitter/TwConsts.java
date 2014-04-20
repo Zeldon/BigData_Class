@@ -32,5 +32,5 @@ public class TwConsts {
 	public static final int NUM_BEST_TRENDS = 50;
 
 
-	public static final String FIRST_DAY_FILE_ATT = "FIRST_DAY_FILE";
+	public static final String DAY_STATS_DATA_FOLDER_ATT = "DAY_STATS_FOLDER";
 }
