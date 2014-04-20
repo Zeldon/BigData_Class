@@ -2,14 +2,6 @@ package sg.edu.nus.cs5344.spring14.twitter;
 
 public class TwConsts {
 
-
-	// Based on http://www2.lv.psu.edu/jxm57/irp/chisquar.html
-	// 95% significance = 3.84
-	// 99% significance = 6.64
-	public static final double CHI_THRESHOLD = 6.64;
-
-	public static final int MIN_DAYLY_TWEETS = 10;
-
 	/**
 	 * Defines the number of previous days we compare the current day against
 	 * when finding trends.
@@ -31,6 +23,14 @@ public class TwConsts {
 	 */
 	public static final int NUM_BEST_TRENDS = 50;
 
+	/**
+	 * All day indexes strictly lower than this value, should not be included.
+	 * Value is 158 = 2012-09-06, which is the first day after the great spikes
+	 * in data frequency.
+	 */
+	public static final int FILTER_FIRST_DAY = 158;
+
+	public static final int FILTER_MIN_HASHTAGS_PER_DAY = 110000;
 
 	public static final String DAY_STATS_DATA_FOLDER_ATT = "DAY_STATS_FOLDER";
 }
