@@ -11,16 +11,19 @@ public class Day extends VIntWritable implements Copyable<Day> {
 
 
 	/**
-	 * Day zero of the day index. <b>DO NOT MODIFY</b>
+	 * Day zero of the day index. <b>DO NOT MODIFY</b>.
 	 *
 	 * <p>
-	 * It is specified to be 1359562320000L which is 2014-12-31.
+	 * It is specified to be 1359562320000L which is 2012-04-01.
+	 * The first tweets are believed to be from 2012-04-02, so days indexes should start at
+	 * 1, but DO NOT count on this!
 	 * Run this code, to calculate new values:
 	 * <pre>
-	 * System.out.println((new SimpleDateFormat("yyyy-mm-dd")).parse("2013-12-31").getTime());
+	 * System.out.println((new SimpleDateFormat("yyyy-MM-dd")).parse("2012-04-01").getTime());
 	 * </pre>
 	 */
-	private static final Time DAY_ZERO = new Time(1359562320000L);
+	// SERIOUSLY Do not modify! The filter is hardcoded relative to this variable
+	private static final Time DAY_ZERO = new Time(1333209600000L);
 
 	public Day(){
 	}
