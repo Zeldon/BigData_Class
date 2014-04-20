@@ -7,6 +7,7 @@ import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_CHI_THRESHOLD;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_LOOKBACK;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_MIN_DAYLY_TWEETS;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_MISSING_DAY_TOLLERANCE;
+import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_USE_ALT_CHI;
 import static sg.edu.nus.cs5344.spring14.twitter.TwConsts.TREND_WEEKDAY_BOOST;
 
 import java.io.IOException;
@@ -24,7 +25,6 @@ import org.apache.hadoop.io.VIntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import sg.edu.nus.cs5344.spring14.twitter.TwConsts;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Day;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Hashtag;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Trend;
@@ -110,8 +110,8 @@ public class JobCFindTrends {
 				// Lecture 6 slide 10-13
 				double expected = calcExpected(prevDays, thisDay);
 				double observed = pair.getCount().get();
-				double denominator = TwConsts.TREND_USE_ALT_CHI ? observed : expected;
-				double chiSq = ((observed - expected) * (observed - expected)) / expected;
+				double denominator = TREND_USE_ALT_CHI ? observed : expected;
+				double chiSq = ((observed - expected) * (observed - expected)) / denominator;
 
 				// Detect trends, build Trend objects, and keep the best
 				if (chiSq > TREND_CHI_THRESHOLD && observed > expected) {
