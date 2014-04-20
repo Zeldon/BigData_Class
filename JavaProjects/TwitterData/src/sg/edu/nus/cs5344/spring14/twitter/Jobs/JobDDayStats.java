@@ -8,19 +8,17 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Day;
-import sg.edu.nus.cs5344.spring14.twitter.datastructure.Hashtag;
 import sg.edu.nus.cs5344.spring14.twitter.datastructure.Tweet;
 
 public class JobDDayStats {
 
 	public static class MapperImpl extends Mapper<Tweet, NullWritable, Day, VIntWritable> {
-		private VIntWritable ONE = new VIntWritable(1);
-
 		@Override
 		protected void map(Tweet tweet, NullWritable nothing, Context context) throws IOException, InterruptedException {
 			Day day = tweet.getTime().getDay();
-			for (Hashtag hashtag : tweet.getHashTagList()) {
-				context.write(day, ONE);
+			int numHashtags = tweet.getHashTagList().size();
+			if (numHashtags > 0) {
+				context.write(day, new VIntWritable(numHashtags));
 			}
 		}
 	}
