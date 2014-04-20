@@ -73,8 +73,6 @@ public class JobFTweetsForTrends {
 	}
 
 	public static class ReducerImpl extends Reducer<Hashtag, Tweet, Hashtag, TweetList> {
-		private static final NullWritable NULL = NullWritable.get();
-
 		@Override
 		protected void reduce(Hashtag hastag, Iterable<Tweet> tweets, Context context) throws IOException,
 				InterruptedException {
