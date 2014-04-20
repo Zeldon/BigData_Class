@@ -1,0 +1,54 @@
+Format:
+#[hashtag]\tTrend: #[hashtag], [chiSq], [count], [firsday] -> [lastday] 
+
+
+#ConfessionNight	Trend: #ConfessionNight, 2546211.6, 40, 55 -> 55
+#ThoughtsInTheHallway	Trend: #ThoughtsInTheHallway, 2021401.6, 14, -15 -> -15
+#StoryBehindMyScar	Trend: #StoryBehindMyScar, 1833552.4, 27, -26 -> -26
+#EasilyAttractedTo	Trend: #EasilyAttractedTo, 1774094.4, 979, -49 -> -49
+#PerksOfDatingMe	Trend: #PerksOfDatingMe, 1132995.6, 11, 53 -> 53
+#election2012	Trend: #election2012, 967210.0, 18, -83 -> -83
+#Job	Trend: #Job, 879715.6, 1213, -217 -> -217
+#halloween	Trend: #halloween, 780084.9, 18, -94 -> -94
+#SecondarySchoolMemories	Trend: #SecondarySchoolMemories, 765628.9, 28, -117 -> -117
+#sandy	Trend: #sandy, 758451.6, 22, -73 -> -73
+#IGotAThingFor	Trend: #IGotAThingFor, 717704.1, 12, 57 -> 57
+#30FactsAboutMe	Trend: #30FactsAboutMe, 681210.0, 787, 8 -> 8
+#VSFashionShow	Trend: #VSFashionShow, 646176.4, 14, -84 -> -84
+#InMiddleSchool	Trend: #InMiddleSchool, 642622.5, 156, 8 -> 8
+#TweetMyJobs	Trend: #TweetMyJobs, 570254.4, 124, 61 -> 61
+#Halloween	Trend: #Halloween, 559795.6, 12, -127 -> -127
+#thanksgiving	Trend: #thanksgiving, 555073.6, 23, -76 -> -76
+#2012TaughtMe	Trend: #2012TaughtMe, 527161.6, 218, -32 -> -32
+#Election2012	Trend: #Election2012, 509856.4, 15, -94 -> -94
+#GoldenGlobes	Trend: #GoldenGlobes, 473062.5, 14, -14 -> -14
+#QuoteYourTeacher	Trend: #QuoteYourTeacher, 440160.4, 152, -39 -> -39
+#MentionSomeoneYoureThankfulFor	Trend: #MentionSomeoneYoureThankfulFor, 435139.6, 52, 20 -> 20
+#SomethingICantDealWith	Trend: #SomethingICantDealWith, 433056.1, 20, -148 -> -148
+#GottaAceMySATexam	Trend: #GottaAceMySATexam, 432224.1, 911, -93 -> -93
+#Obama	Trend: #Obama, 427248.9, 260, 21 -> 21
+#YouGainPointsIf	Trend: #YouGainPointsIf, 423948.1, 24, 64 -> 64
+#TweetYourFear	Trend: #TweetYourFear, 381811.6, 684, 56 -> 56
+#15factsaboutme	Trend: #15factsaboutme, 380250.0, 45, -24 -> -24
+#IfWeDate	Trend: #IfWeDate, 376360.0, 30, 32 -> 32
+#BlackFriday	Trend: #BlackFriday, 372876.1, 16, -90 -> -90
+#Thanksgiving	Trend: #Thanksgiving, 372490.0, 21, -66 -> -66
+#Obama2012	Trend: #Obama2012, 372490.0, 20, -108 -> -108
+#christmas	Trend: #christmas, 364810.0, 15, -64 -> -64
+#NationalBoyfriendDay	Trend: #NationalBoyfriendDay, 364046.4, 11, -118 -> -118
+#Mention20PeopleYouWantToMeet	Trend: #Mention20PeopleYouWantToMeet, 360240.4, 164, -89 -> -89
+#WhyDoPeopleThinkItsOkayTo	Trend: #WhyDoPeopleThinkItsOkayTo, 358723.6, 215, -147 -> -147
+#LyricsWeAllKnow	Trend: #LyricsWeAllKnow, 344473.6, 12, -68 -> -68
+#MentionAnAddiction	Trend: #MentionAnAddiction, 341140.9, 13, 62 -> 62
+#Jobs	Trend: #Jobs, 341140.9, 844, 40 -> 40
+#LyricsYouLikeToScream	Trend: #LyricsYouLikeToScream, 336722.5, 13, -28 -> -28
+#TalkLikeYourBestfriend	Trend: #TalkLikeYourBestfriend, 315772.9, 15, -56 -> -56
+#121212concert	Trend: #121212concert, 312582.4, 42, -47 -> -47
+#ThoughtsDuringSchool	Trend: #ThoughtsDuringSchool, 303804.9, 79, -176 -> -176
+#Sandy	Trend: #Sandy, 297217.6, 12, -92 -> -92
+#IGoToASchoolWhere	Trend: #IGoToASchoolWhere, 289680.4, 14, -4 -> -4
+#SingleBecause	Trend: #SingleBecause, 287641.6, 11, -21 -> -21
+#HappyNewYear	Trend: #HappyNewYear, 285272.1, 891, -30 -> -30
+#LyricsILikeToScream	Trend: #LyricsILikeToScream, 283585.6, 37, -3 -> -3
+#ImThankfulFor	Trend: #ImThankfulFor, 273571.6, 12, -70 -> -70
+#NYE	Trend: #NYE, 267649.6, 54, -32 -> -32
