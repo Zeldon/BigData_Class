@@ -24,6 +24,9 @@ public class CmdArguments {
 	@Parameter(names = {"-s","--skip"}, variableArity = true, description="Skip jobs based on ID. You can specify multiple job IDs after this flag, e.g. --skip A B ")
 	private List<String> skipTheseJob = new ArrayList<String>();
 
+	@Parameter(names = {"-o","--only"}, variableArity = true, description="Run only these jobs based on ID. Takes precedence over --skip. You can specify multiple job IDs after this flag, e.g. --only A B ")
+	private List<String> onlyTheseJob = new ArrayList<String>();
+
 	// Do not allow clients to instantiate
 	private CmdArguments(String[] args) {
 		// Overwrite command line
@@ -46,7 +49,12 @@ public class CmdArguments {
 	}
 
 	public boolean skipJob(String ID) {
-		return skipTheseJob.contains(ID);
+		if (onlyTheseJob.isEmpty()) {
+			return skipTheseJob.contains(ID);
+		} else {
+			return !onlyTheseJob.contains(ID);
+		}
+
 	}
 
 }
