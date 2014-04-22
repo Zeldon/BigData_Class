@@ -9,7 +9,7 @@ import sg.edu.nus.cs5344.spring14.twitter.datastructure.collections.TweetList;
 
 public class TweetFormater implements KeyValueFormatter<Hashtag, TweetList> {
 
-	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	@Override
 	public String format(Hashtag key, TweetList value) {
